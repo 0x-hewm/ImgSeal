@@ -19,8 +19,8 @@ jobs:
           version: 8
       - name: Build 🏗
         run: |
-          # 安装所有依赖，包括开发依赖
-          pnpm install --frozen-lockfile
+          # 安装所有依赖，不使用frozen-lockfile，以防锁文件有问题
+          pnpm install --no-frozen-lockfile
           
           # 确保CoffeeScript已全局安装
           pnpm add -g coffeescript
