@@ -19,9 +19,20 @@ jobs:
           version: 8
       - name: Build 🏗
         run: |
-          pnpm install
+          # 安装所有依赖，包括开发依赖
+          pnpm install --frozen-lockfile
+          
+          # 确保CoffeeScript已全局安装
           pnpm add -g coffeescript
+          
+          # 构建项目
           pnpm build
+          
+          # 验证构建结果
+          echo "验证构建文件是否存在..."
+          ls -la public/
+          
+          # 处理占位符
           echo "${{ secrets.STATS_SCRIPT }}" > placeholder
           sed -i "/<!-- placeholder -->/ {
             r placeholder

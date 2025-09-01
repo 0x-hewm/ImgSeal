@@ -4,13 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cake build"
+    "build": "cake build",
+    "start": "npm run build && cd public && python3 -m http.server 8080",
+    "watch": "coffee -cw -o public src"
   },
   "keywords": [],
   "author": "",
   "license": "GPL-3.0-only",
   "dependencies": {
     "coffeescript": "^2.7.0",
-    "pdfjs-dist": "^3.11.174"
+    "pdfjs-dist": "^3.11.174",
+    "jspdf": "^2.5.1"
   }
 }
