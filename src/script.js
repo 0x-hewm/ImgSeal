@@ -248,12 +248,12 @@
         processedCount++;
         return renderPreviewPages(pagesArray, previewContainer, processedCount, loadingMessage, onComplete);
       }).catch(function(error) {
-        console.error(`预览渲染第${pageNum}页失败:`, error);
+        // console.error(`预览渲染第${pageNum}页失败:`, error);
         processedCount++;
         return renderPreviewPages(pagesArray, previewContainer, processedCount, loadingMessage, onComplete);
       });
     }).catch(function(error) {
-      console.error(`获取第${pageNum}页失败:`, error);
+      // console.error(`获取第${pageNum}页失败:`, error);
       processedCount++;
       return renderPreviewPages(pagesArray, previewContainer, processedCount, loadingMessage, onComplete);
     });
