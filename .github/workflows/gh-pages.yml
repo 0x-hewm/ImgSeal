@@ -20,6 +20,7 @@ jobs:
       - name: Build 🏗
         run: |
           pnpm install
+          pnpm add -g coffeescript
           pnpm build
           echo "${{ secrets.STATS_SCRIPT }}" > placeholder
           sed -i "/<!-- placeholder -->/ {
@@ -31,3 +32,5 @@ jobs:
         with:
           branch: gh-pages
           folder: public
+          clean: true  # 清理旧文件
+          single-commit: false  # 保存部署历史
