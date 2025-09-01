@@ -15,8 +15,6 @@ build = (callback) ->
         # 使用全局coffee或npx
         coffeeCmd = 'npx coffee'
     
-    console.log "Using coffee command: #{coffeeCmd}"
-    
     # 使用exec而不是spawn，这样可以更好地处理路径
     exec "#{coffeeCmd} -c -o public src", (error, stdout, stderr) ->
         if stdout
@@ -27,7 +25,6 @@ build = (callback) ->
             console.error "Build failed:", error
             process.exit(1)
         else
-            console.log "Build completed successfully"
             callback?()
 
 task 'build', 'Build ./public from src/', ->

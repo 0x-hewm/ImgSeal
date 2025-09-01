@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>ImgSeal - 专业图片水印工具</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&family=Roboto:wght@400;500;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -159,7 +162,7 @@
             background: rgba(102, 126, 234, 0.05);
         }
 
-        .radio-option input[type="radio"]:checked + .radio-label {
+        .radio-option input[type="radio"]:checked+.radio-label {
             color: #667eea;
             font-weight: 600;
         }
@@ -545,28 +548,28 @@
                 margin: 10px;
                 border-radius: 15px;
             }
-            
+
             .header {
                 padding: 20px;
             }
-            
+
             .header h1 {
                 font-size: 2em;
             }
-            
+
             .main-content {
                 padding: 20px;
             }
-            
+
             .header .features {
                 gap: 15px;
             }
-            
+
             .range-group {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
-            
+
             .radio-group {
                 flex-direction: column;
                 gap: 10px;
@@ -702,6 +705,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -744,7 +748,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- PDF页面选择器 -->
                 <div id="pdf-pages-container" style="display: none;">
                     <label class="form-label">PDF页面管理</label>
@@ -788,7 +792,8 @@
                                 <i class="fas fa-download"></i>
                                 下载选中页面
                             </button>
-                            <button id="preview-selected-pages" class="btn btn-outline-secondary" title="一般情况下预览会自动更新，只有在遇到问题时才需要手动刷新">
+                            <button id="preview-selected-pages" class="btn btn-outline-secondary"
+                                title="一般情况下预览会自动更新，只有在遇到问题时才需要手动刷新">
                                 <i class="fas fa-sync-alt"></i>
                                 手动刷新
                             </button>
@@ -832,7 +837,7 @@
                         </label>
                         <textarea id="text" class="textarea-control" placeholder="请输入水印文字，支持换行" rows="3"></textarea>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">字体</label>
                         <select id="font-family" class="form-control">
@@ -860,7 +865,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">水印位置</label>
                         <select id="watermark-position" class="form-control">
@@ -881,31 +886,31 @@
                     <div class="step-number">3</div>
                     <div class="step-title">调整参数</div>
                 </div>
-                
+
                 <div class="range-group">
                     <div class="range-item">
                         <label class="form-label">颜色</label>
                         <input type="color" id="color" class="form-control" value="#0000FF">
                     </div>
-                    
+
                     <div class="range-item">
                         <label class="form-label">透明度</label>
                         <input type="range" id="alpha" class="range-control" min="0" max="1" step="0.05" value="0.15">
                         <div class="range-value" id="alpha-value">15%</div>
                     </div>
-                    
+
                     <div class="range-item">
                         <label class="form-label">角度</label>
                         <input type="range" id="angle" class="range-control" min="-90" max="90" step="3" value="45">
                         <div class="range-value" id="angle-value">45°</div>
                     </div>
-                    
+
                     <div class="range-item">
                         <label class="form-label">间隔</label>
                         <input type="range" id="space" class="range-control" min="1" max="8" step="0.2" value="4">
                         <div class="range-value" id="space-value">4x</div>
                     </div>
-                    
+
                     <div class="range-item">
                         <label class="form-label">大小</label>
                         <input type="range" id="size" class="range-control" min="0.5" max="3" step="0.05" value="1">
@@ -920,7 +925,7 @@
                     <div class="step-number">4</div>
                     <div class="step-title">预览和下载</div>
                 </div>
-                
+
                 <div class="controls">
                     <label class="radio-option">
                         <input type="checkbox" id="auto-refresh" checked>
@@ -934,13 +939,13 @@
                         手动刷新
                     </button>
                 </div>
-                
+
                 <div class="canvas-container">
                     <div id="graph"></div>
                 </div>
             </div>
         </div>
-        
+
         <!-- 页脚 -->
         <div class="footer">
             <div class="footer-content">
@@ -956,12 +961,12 @@
         if (typeof pdfjsLib !== 'undefined') {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
-        
+
         // 确保jsPDF正确加载
         window.jsPDF = window.jspdf?.jsPDF || window.jsPDF;
-        
+
         // 为不同环境提供BASE_URL支持
-        window.BASE_URL = (function() {
+        window.BASE_URL = (function () {
             // 获取当前脚本的路径
             const scripts = document.getElementsByTagName('script');
             const script = scripts[scripts.length - 1];
@@ -971,4 +976,5 @@
     </script>
     <script src="./script.js"></script>
     <!-- placeholder -->
+
 </html>

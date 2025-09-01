@@ -59,6 +59,3 @@ typings/
 
 # next.js build output
 .next
-
-# 排除构建后的JavaScript文件，但保留public/script.js
-# public/*.js

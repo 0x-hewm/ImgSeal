@@ -87,11 +87,9 @@
 
   // 自动更新预览区域（简化版，使用直接的延迟更新和防递归标志）
   updatePreviewArea = function() {
-    console.log(`调用 updatePreviewArea(), isUpdatingPreview = ${isUpdatingPreview}`);
     
     // 如果已经在更新中，则忽略此次调用
     if (isUpdatingPreview) {
-      console.log("预览区域正在更新中，忽略此次调用");
       return;
     }
     if (updateTimeout) {
@@ -105,7 +103,6 @@
       var emptyMessage, err, loadingMessage, pagesArray, previewContainer, processedCount;
       // 设置更新标志，防止递归调用
       isUpdatingPreview = true;
-      console.log("执行延迟的预览更新，设置isUpdatingPreview = true");
       try {
         // 清空之前的预览
         graph.innerHTML = '<div class="preview-container"></div>';
@@ -120,7 +117,6 @@
           
           // 完成更新，重置标志
           isUpdatingPreview = false;
-          console.log("没有选中页面，重置isUpdatingPreview = false");
           return;
         }
         
@@ -139,15 +135,12 @@
         // 强制清除缓存，确保每次都使用最新的水印设置
         if (processedCanvases != null) {
           processedCanvases.clear();
-          console.log("已清除处理缓存");
         }
         
         // 渲染选中的页面
-        console.log(`开始渲染预览页面，共${pagesArray.length}页`);
         return renderPreviewPages(pagesArray, previewContainer, processedCount, loadingMessage, function() {
           // 在渲染完成后重置标志
-          isUpdatingPreview = false;
-          return console.log("预览渲染完成，重置isUpdatingPreview = false");
+          return isUpdatingPreview = false;
         });
       } catch (error1) {
         err = error1;
@@ -166,14 +159,12 @@
       if (loadingMessage != null) {
         loadingMessage.remove();
       }
-      console.log("所有预览页面渲染完成");
       if (typeof onComplete === "function") {
         onComplete();
       }
       return;
     }
     pageNum = pagesArray[processedCount];
-    console.log(`渲染预览页面 ${pageNum}, 进度: ${processedCount + 1}/${pagesArray.length}`);
     
     // 确保PDF已加载
     if (state.currentPDF == null) {
@@ -195,17 +186,14 @@
       };
       return page.render(renderContext).promise.then(function() {
         var pagePreviewDiv, pageTitle;
-        console.log(`页面${pageNum}基础渲染完成，应用水印`);
         
         // 应用水印
         if (watermarkType === 'text' && input.text.value) {
-          console.log(`应用文字水印到页面${pageNum}`);
           drawTextWatermarkOnCanvas(pageCanvas, context);
         } else if (watermarkType === 'image' && (watermarkImageFile != null)) {
-          console.log(`应用图片水印到页面${pageNum}`);
           drawImageWatermarkOnCanvas(pageCanvas, context);
         } else {
-          console.log(`没有应用水印到页面${pageNum}: watermarkType=${watermarkType}, text=${!!input.text.value}, image=${!!watermarkImageFile}`);
+
         }
         
         // 添加到预览容器
@@ -282,7 +270,6 @@
       console.error('PDF.js 库加载不完整');
       return false;
     }
-    console.log('PDF.js 库检查通过');
     return true;
   };
 
@@ -420,17 +407,13 @@
       alert('PDF.js 库未正确加载，请刷新页面重试');
       return;
     }
-    console.log('PDF文件读取开始...');
     fileReader = new FileReader();
     fileReader.onload = function() {
       var generalError, loadingTask;
-      console.log('PDF文件读取完成，文件大小:', fileReader.result.byteLength, '字节');
       try {
         loadingTask = pdfjsLib.getDocument(fileReader.result);
-        console.log('PDF解析任务已创建');
         return loadingTask.promise.then(function(pdf) {
           var loadingDiv, numPages;
-          console.log('PDF解析成功，页数:', pdf.numPages);
           state.currentPDF = pdf;
           pdfDocument = pdf;
           numPages = pdf.numPages;
@@ -694,7 +677,6 @@
         }).catch(function(error) {
           console.error(`第 ${pageNum} 页渲染失败:`, error);
           if (retryCount < 2) {
-            console.log(`尝试重新渲染第 ${pageNum} 页 (重试 ${retryCount + 1}/2)`);
             return setTimeout(function() {
               return attemptRender(retryCount + 1);
             }, 500);
@@ -987,11 +969,9 @@
   // 下载为PDF格式
   downloadAsPDF = function() {
     var jsPDFLib, pagesArray, processNextPage, ref;
-    console.log('downloadAsPDF开始执行');
     
     // 检查jsPDF是否可用
     jsPDFLib = window.jsPDF || ((ref = window.jspdf) != null ? ref.jsPDF : void 0);
-    console.log('jsPDF库检查:', jsPDFLib);
     if (jsPDFLib == null) {
       alert('PDF生成库未加载，请刷新页面重试');
       return;
@@ -1001,17 +981,14 @@
       return a - b;
     });
     processedCanvases.clear(); // 清除旧缓存
-    console.log('准备处理页面:', pagesArray);
     processNextPage = function(index) {
       var error, link, pageNum, pdfBlob;
-      console.log(`处理页面索引: ${index}/${pagesArray.length}`);
       if (index >= pagesArray.length) {
-        console.log('所有页面处理完成，开始生成PDF');
+        
         // 创建PDF
         if (processedCanvases.size > 0) {
           try {
             pdfBlob = createPDFBlob(Array.from(processedCanvases.values()));
-            console.log('生成的PDF blob:', pdfBlob);
             if (pdfBlob) {
               link = document.createElement('a');
               link.download = generateFileName(null, true).replace(/\.[^\/.]+$/, '.pdf');
@@ -1019,7 +996,6 @@
               document.body.appendChild(link);
               link.click();
               document.body.removeChild(link);
-              console.log('PDF下载已触发');
             } else {
               alert('PDF生成失败');
               console.error('PDF blob生成失败');
@@ -1037,10 +1013,8 @@
         return;
       }
       pageNum = pagesArray[index];
-      console.log(`开始处理第${pageNum}页`);
       return state.currentPDF.getPage(pageNum).then(function(page) {
         var context, pageCanvas, renderContext, scale, viewport;
-        console.log(`成功获取第${pageNum}页`);
         scale = 2.0; // 高质量
         viewport = page.getViewport({
           scale: scale
@@ -1054,18 +1028,14 @@
           viewport: viewport
         };
         return page.render(renderContext).promise.then(function() {
-          console.log(`第${pageNum}页渲染完成`);
           
           // 应用水印
           if (watermarkType === 'text' && input.text.value) {
-            console.log(`应用文字水印到第${pageNum}页`);
             drawTextWatermarkOnCanvas(pageCanvas, context);
           } else if (watermarkType === 'image' && (watermarkImageFile != null)) {
-            console.log(`应用图片水印到第${pageNum}页`);
             drawImageWatermarkOnCanvas(pageCanvas, context);
           }
           processedCanvases.set(pageNum, pageCanvas);
-          console.log(`第${pageNum}页已添加到处理列表，当前总数:`, processedCanvases.size);
           
           // 延迟处理下一页
           return setTimeout(function() {
@@ -1478,19 +1448,16 @@
   textWatermarkRadio.addEventListener('change', function() {
     var isPDF;
     if (this.checked) {
-      console.log("切换到文字水印");
       watermarkType = 'text';
       textWatermarkOptions.style.display = 'block';
       imageWatermarkOptions.style.display = 'none';
       isPDF = originalFileType === 'application/pdf';
       if (!isPDF && (canvas != null) && input.text.value && autoRefresh.checked) {
-        console.log("应用文字水印到单页图片");
         drawText();
       }
       
       // 对于PDF文件，强制更新预览区域
       if (isPDF) {
-        console.log("PDF文件，强制更新预览区域（文字水印）");
         isUpdatingPreview = false; // 强制清除标志
         return updatePreviewArea();
       }
@@ -1500,19 +1467,16 @@
   imageWatermarkRadio.addEventListener('change', function() {
     var isPDF;
     if (this.checked) {
-      console.log("切换到图片水印");
       watermarkType = 'image';
       textWatermarkOptions.style.display = 'none';
       imageWatermarkOptions.style.display = 'block';
       isPDF = originalFileType === 'application/pdf';
       if (!isPDF && (canvas != null) && (watermarkImageFile != null) && autoRefresh.checked) {
-        console.log("应用图片水印到单页图片");
         drawImageWatermark();
       }
       
       // 对于PDF文件，强制更新预览区域
       if (isPDF) {
-        console.log("PDF文件，强制更新预览区域（图片水印）");
         isUpdatingPreview = false; // 强制清除标志
         return updatePreviewArea();
       }
@@ -1606,24 +1570,19 @@
     // 对于任何参数调整，直接更新所有内容
     updatePreviewOnChange = function() {
       var isPDF;
-      console.log(`参数变更: ${item}, 类型: ${el.type}, 值: ${el.value}`);
       
       // 标记当前是PDF文件
       isPDF = originalFileType === 'application/pdf';
-      console.log(`文件类型: ${originalFileType}, 是否PDF: ${isPDF}`);
       if (!isPDF && autoRefresh.checked) {
         if (watermarkType === 'text') {
-          console.log(`应用文字水印到单页图片: ${input.text.value}`);
           drawText();
         } else if (watermarkImageFile != null) {
-          console.log("应用图片水印到单页图片");
           drawImageWatermark();
         }
       }
       
       // 对于PDF文件，直接强制更新预览区域
       if (isPDF) {
-        console.log("PDF文件，直接更新预览区域，跳过单页更新");
         
         // 强制清除更新标志，确保能够重新触发更新
         isUpdatingPreview = false;
@@ -1636,7 +1595,7 @@
           return updatePreviewArea();
         }, 50);
       } else {
-        return console.log("非PDF文件，不更新预览区域");
+
       }
     };
     
@@ -1660,21 +1619,17 @@
   // 手动刷新按钮
   refresh.addEventListener('click', function() {
     var isPDF;
-    console.log("点击刷新按钮");
     isPDF = originalFileType === 'application/pdf';
     if (!isPDF) {
       if (watermarkType === 'text') {
-        console.log("应用文字水印到单页图片");
         drawText();
       } else if (watermarkImageFile != null) {
-        console.log("应用图片水印到单页图片");
         drawImageWatermark();
       }
     }
     
     // 对于PDF文件，强制刷新预览区域
     if (isPDF) {
-      console.log("PDF文件，强制刷新预览区域");
       
       // 强制清除更新标志，确保能够重新触发更新
       isUpdatingPreview = false;
