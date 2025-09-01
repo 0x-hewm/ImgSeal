@@ -959,6 +959,15 @@
         
         // 确保jsPDF正确加载
         window.jsPDF = window.jspdf?.jsPDF || window.jsPDF;
+        
+        // 为不同环境提供BASE_URL支持
+        window.BASE_URL = (function() {
+            // 获取当前脚本的路径
+            const scripts = document.getElementsByTagName('script');
+            const script = scripts[scripts.length - 1];
+            const src = script.src;
+            return src.substring(0, src.lastIndexOf('/') + 1);
+        })();
     </script>
     <script src="./script.js"></script>
 
