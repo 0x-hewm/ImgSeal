@@ -1,65 +1,965 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <title>图片水印打码工具</title>
+    <title>ImgSeal - 专业图片水印工具</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@400;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        #container {
-            max-width: 500px;
-            margin: 30px auto;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        h1 { margin: 0 }
-        p, article { margin: 0 0 20px 0 }
-        article { font-size: 14px; color: #777 }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
 
-        label { color: blue; font-size: 17px }
-        p label { color: black; display: inline-block; margin-right: 5px; font-size: 15px }
-        p { font-size: 15px; line-height: 30px }
-        p > * { vertical-align: middle }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
 
-        input#text { width: 100%; box-sizing: border-box; font-size: 16px; margin-bottom: 10px }
-        input[type=range] { width: 200px; height: 18px; }
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-        canvas { box-sizing: border-box; width: 100%; border: 1px dashed #AAA; cursor: pointer }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .header .features {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .step {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e1e8ed;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .step-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .radio-option input[type="radio"]:checked {
+            background: #667eea;
+        }
+
+        .range-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .range-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .range-control {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e1e8ed;
+            outline: none;
+        }
+
+        .range-control::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-control::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-value {
+            font-weight: 600;
+            color: #667eea;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .watermark-options {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .canvas-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .canvas-preview {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            max-width: 100%;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .canvas-preview:hover {
+            border-color: #764ba2;
+        }
+
+        .pdf-pages {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .pdf-page {
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .pdf-page:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .pdf-page.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .pdf-page.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .pdf-page canvas {
+            max-width: 100%;
+            border-radius: 4px;
+        }
+
+        .page-number {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .pdf-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .pdf-info {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 多页预览样式 */
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .preview-page {
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .preview-page:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .preview-page h5 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .preview-page canvas {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .preview-page canvas:hover {
+            border-color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e1e8ed;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .download-options {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .download-options h4 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+        }
+
+        .download-format {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .preview-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+
+        .preview-page {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .preview-page h5 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .preview-page canvas {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e1e8ed;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e1e8ed;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            background: rgba(102, 126, 234, 0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload-label i {
+            font-size: 1.5em;
+            color: #667eea;
+        }
+
+        .textarea-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .textarea-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header .features {
+                gap: 15px;
+            }
+            
+            .range-group {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* 欢迎界面样式 */
+        .welcome-message {
+            text-align: center;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .welcome-message h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .welcome-message p {
+            color: #718096;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .welcome-message ul {
+            text-align: left;
+            margin: 15px auto;
+            max-width: 400px;
+            color: #718096;
+        }
+
+        .welcome-message ul li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* 空白预览区域消息 */
+        .empty-preview-message {
+            text-align: center;
+            padding: 30px;
+            color: #718096;
+            background-color: rgba(237, 242, 247, 0.7);
+            border-radius: 8px;
+            margin: 20px auto;
+        }
+
+        .loading-preview-message {
+            text-align: center;
+            padding: 20px;
+            color: #4a5568;
+            font-size: 16px;
+        }
+
+        .loading-preview-message i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            color: #34495e;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        .github-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .github-link i {
+            font-size: 1.2em;
+            margin-right: 6px;
+        }
     </style>
 </head>
-    <div id="container">
-        <h1>图片水印打码工具</h1>
-        <article>安全地为你的图片加水印，无任何网络请求，特别适合各种敏感证件（身份证，驾照，护照等）。<a href="https://github.com/joyqi/sfz">Github地址</a></article>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> ImgSeal</h1>
+            <div class="subtitle">专业图片水印工具 - 安全 · 快速 · 免费</div>
+            <div class="features">
+                <div class="feature">
+                    <i class="fas fa-lock"></i>
+                    <span>本地处理</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-images"></i>
+                    <span>多格式支持</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF处理</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-eye"></i>
+                    <span>实时预览</span>
+                </div>
+            </div>
+        </div>
 
-        <label for="image">第一步：先选择一张本地图片</label>
-        <p><input type="file" id="image" autocomplete="off"></p>
+        <div class="main-content">
+            <!-- 步骤1: 文件选择 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">选择文件</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">支持图片 (PNG, JPG, GIF, WebP, BMP, SVG) 和 PDF 文件</label>
+                    <div class="file-upload">
+                        <input type="file" id="image" accept="image/*,.pdf" autocomplete="off">
+                        <div class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>点击选择文件或拖拽文件到此处</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PDF页面选择器 -->
+                <div id="pdf-pages-container" style="display: none;">
+                    <label class="form-label">PDF页面管理</label>
+                    <div class="pdf-controls">
+                        <div class="pdf-info">
+                            <span id="pdf-page-count">共 0 页</span>
+                            <span id="selected-page-count">已选择 0 页</span>
+                        </div>
+                        <div class="pdf-actions">
+                            <button id="select-all-pages" class="btn btn-secondary">
+                                <i class="fas fa-check-double"></i>
+                                全选
+                            </button>
+                            <button id="clear-selection" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                清除选择
+                            </button>
+                        </div>
+                    </div>
+                    <div id="pdf-pages" class="pdf-pages"></div>
+                    <div class="download-options">
+                        <h4>下载选项</h4>
+                        <div class="download-format">
+                            <label class="radio-option">
+                                <input type="radio" name="download-format" value="individual" checked>
+                                <span class="radio-label">
+                                    <i class="fas fa-images"></i>
+                                    分页下载 (PNG图片)
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="download-format" value="pdf">
+                                <span class="radio-label">
+                                    <i class="fas fa-file-pdf"></i>
+                                    合并下载 (PDF文件)
+                                </span>
+                            </label>
+                        </div>
+                        <div class="controls">
+                            <button id="download-selected-pages" class="btn btn-primary">
+                                <i class="fas fa-download"></i>
+                                下载选中页面
+                            </button>
+                            <button id="preview-selected-pages" class="btn btn-outline-secondary" title="一般情况下预览会自动更新，只有在遇到问题时才需要手动刷新">
+                                <i class="fas fa-sync-alt"></i>
+                                手动刷新
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        
-        <label for="text">第二步：输入需要打水印的文字</label>
-        <p><input type="text" id="text" placeholder="请输入文字" autocomplete="off" maxlength="30">
-        
-        <label for="color">颜色</label>
-        <input type="color" id="color" pattern="#[0-9A-Fa-f]{6}" autocomplete="off" value="#0000FF"><br>
-        
-        <label for="alpha">透明度</label>
-        <input type="range" id="alpha" min="0" max="1" step="0.05" autocomplete="off" value="0.15"><br>
-        
-        <label for="angle">角度</label>
-        <input type="range" id="angle" min="-90" max="90" step="3" autocomplete="off" value="45"><br>
+            <!-- 步骤2: 水印类型 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">选择水印类型</div>
+                </div>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" id="text-watermark" name="watermark-type" value="text" checked>
+                        <span class="radio-label">
+                            <i class="fas fa-font"></i>
+                            文字水印
+                        </span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" id="image-watermark" name="watermark-type" value="image">
+                        <span class="radio-label">
+                            <i class="fas fa-image"></i>
+                            图片水印
+                        </span>
+                    </label>
+                </div>
 
-        <label for="space">间隔</label>
-        <input type="range" id="space" min="1" max="8" step="0.2" autocomplete="off" value="4"><br>
+                <!-- 文字水印选项 -->
+                <div id="text-watermark-options" class="watermark-options">
+                    <div class="form-group">
+                        <label class="form-label">
+                            水印文字
+                            <span class="tooltip">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltiptext">支持换行，使用 \n 或按回车键换行</span>
+                            </span>
+                        </label>
+                        <textarea id="text" class="textarea-control" placeholder="请输入水印文字，支持换行" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">字体</label>
+                        <select id="font-family" class="form-control">
+                            <option value="system">系统默认</option>
+                            <option value="serif">宋体/Times</option>
+                            <option value="sans-serif">黑体/Arial</option>
+                            <option value="monospace">等宽字体</option>
+                            <option value="source-han-sans">思源黑体</option>
+                            <option value="source-han-serif">思源宋体</option>
+                            <option value="noto-sans">Noto Sans</option>
+                            <option value="roboto">Roboto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 图片水印选项 -->
+                <div id="image-watermark-options" class="watermark-options" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">选择水印图片</label>
+                        <div class="file-upload">
+                            <input type="file" id="watermark-image" accept="image/*" autocomplete="off">
+                            <div class="file-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>选择水印图片</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">水印位置</label>
+                        <select id="watermark-position" class="form-control">
+                            <option value="center">居中</option>
+                            <option value="top-left">左上角</option>
+                            <option value="top-right">右上角</option>
+                            <option value="bottom-left">左下角</option>
+                            <option value="bottom-right">右下角</option>
+                            <option value="repeat">平铺</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤3: 参数调整 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">调整参数</div>
+                </div>
+                
+                <div class="range-group">
+                    <div class="range-item">
+                        <label class="form-label">颜色</label>
+                        <input type="color" id="color" class="form-control" value="#0000FF">
+                    </div>
+                    
+                    <div class="range-item">
+                        <label class="form-label">透明度</label>
+                        <input type="range" id="alpha" class="range-control" min="0" max="1" step="0.05" value="0.15">
+                        <div class="range-value" id="alpha-value">15%</div>
+                    </div>
+                    
+                    <div class="range-item">
+                        <label class="form-label">角度</label>
+                        <input type="range" id="angle" class="range-control" min="-90" max="90" step="3" value="45">
+                        <div class="range-value" id="angle-value">45°</div>
+                    </div>
+                    
+                    <div class="range-item">
+                        <label class="form-label">间隔</label>
+                        <input type="range" id="space" class="range-control" min="1" max="8" step="0.2" value="4">
+                        <div class="range-value" id="space-value">4x</div>
+                    </div>
+                    
+                    <div class="range-item">
+                        <label class="form-label">大小</label>
+                        <input type="range" id="size" class="range-control" min="0.5" max="3" step="0.05" value="1">
+                        <div class="range-value" id="size-value">1x</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 步骤4: 预览和下载 -->
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">预览和下载</div>
+                </div>
+                
+                <div class="controls">
+                    <label class="radio-option">
+                        <input type="checkbox" id="auto-refresh" checked>
+                        <span class="radio-label">
+                            <i class="fas fa-sync-alt"></i>
+                            实时预览
+                        </span>
+                    </label>
+                    <button id="refresh" class="btn btn-secondary" disabled>
+                        <i class="fas fa-redo"></i>
+                        手动刷新
+                    </button>
+                </div>
+                
+                <div class="canvas-container">
+                    <div id="graph"></div>
+                </div>
+            </div>
+        </div>
         
-        <label for="size">字号</label>
-        <input type="range" id="size" min="0.5" max="3" step="0.05" autocomplete="off" value="1">
-        </p>
-        
-        <label for="text">第三步：点击图片下载</label>
-        <p>
-            <label for="auto-refresh">实时刷新</label>
-            <input type="checkbox" id="auto-refresh" autocomplete="off" checked>
-            <button id="refresh" disabled>刷新</button>
-        </p>
-        <p id="graph"></p>
+        <!-- 页脚 -->
+        <div class="footer">
+            <div class="footer-content">
+                <a href="https://github.com/0x-hewm/ImgSeal" target="_blank" class="github-link">
+                    <i class="fab fa-github"></i> GitHub仓库
+                </a>
+            </div>
+        </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+        
+        // 确保jsPDF正确加载
+        window.jsPDF = window.jspdf?.jsPDF || window.jsPDF;
+    </script>
     <script src="./script.js"></script>
     <!-- placeholder -->
 </html>
