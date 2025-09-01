@@ -28,6 +28,9 @@ jobs:
           # 构建项目
           pnpm build
           
+          # 复制根目录的index.html到public目录
+          cp index.html public/_root_index.html
+          
           # 验证构建结果
           echo "验证构建文件是否存在..."
           ls -la public/
@@ -45,3 +48,5 @@ jobs:
           folder: public
           clean: true  # 清理旧文件
           single-commit: false  # 保存部署历史
+          clean-exclude: |
+            .nojekyll
