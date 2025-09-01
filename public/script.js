@@ -87,11 +87,11 @@
 
   // 自动更新预览区域（简化版，使用直接的延迟更新和防递归标志）
   updatePreviewArea = function() {
-    // console.log(`调用 updatePreviewArea(), isUpdatingPreview = ${isUpdatingPreview}`);
+    console.log(`调用 updatePreviewArea(), isUpdatingPreview = ${isUpdatingPreview}`);
     
     // 如果已经在更新中，则忽略此次调用
     if (isUpdatingPreview) {
-      // console.log("预览区域正在更新中，忽略此次调用");
+      console.log("预览区域正在更新中，忽略此次调用");
       return;
     }
     if (updateTimeout) {
@@ -105,7 +105,7 @@
       var emptyMessage, err, loadingMessage, pagesArray, previewContainer, processedCount;
       // 设置更新标志，防止递归调用
       isUpdatingPreview = true;
-      // console.log("执行延迟的预览更新，设置isUpdatingPreview = true");
+      console.log("执行延迟的预览更新，设置isUpdatingPreview = true");
       try {
         // 清空之前的预览
         graph.innerHTML = '<div class="preview-container"></div>';
@@ -120,7 +120,7 @@
           
           // 完成更新，重置标志
           isUpdatingPreview = false;
-          // console.log("没有选中页面，重置isUpdatingPreview = false");
+          console.log("没有选中页面，重置isUpdatingPreview = false");
           return;
         }
         
@@ -139,11 +139,11 @@
         // 强制清除缓存，确保每次都使用最新的水印设置
         if (processedCanvases != null) {
           processedCanvases.clear();
-          // console.log("已清除处理缓存");
+          console.log("已清除处理缓存");
         }
         
         // 渲染选中的页面
-        // console.log(`开始渲染预览页面，共${pagesArray.length}页`);
+        console.log(`开始渲染预览页面，共${pagesArray.length}页`);
         return renderPreviewPages(pagesArray, previewContainer, processedCount, loadingMessage, function() {
           // 在渲染完成后重置标志
           isUpdatingPreview = false;
@@ -166,14 +166,14 @@
       if (loadingMessage != null) {
         loadingMessage.remove();
       }
-      // console.log("所有预览页面渲染完成");
+      console.log("所有预览页面渲染完成");
       if (typeof onComplete === "function") {
         onComplete();
       }
       return;
     }
     pageNum = pagesArray[processedCount];
-    // console.log(`渲染预览页面 ${pageNum}, 进度: ${processedCount + 1}/${pagesArray.length}`);
+    console.log(`渲染预览页面 ${pageNum}, 进度: ${processedCount + 1}/${pagesArray.length}`);
     
     // 确保PDF已加载
     if (state.currentPDF == null) {

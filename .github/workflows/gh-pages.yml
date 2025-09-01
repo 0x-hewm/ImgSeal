@@ -5,48 +5,59 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js 📦
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Setup pnpm
+          
+      - name: Setup pnpm 🧰
         uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Build 🏗
+          
+      - name: Install dependencies 📥
+        run: pnpm install --no-frozen-lockfile
+        
+      - name: Build project 🏗️
         run: |
-          # 安装所有依赖，不使用frozen-lockfile，以防锁文件有问题
-          pnpm install --no-frozen-lockfile
+          # 确保构建目录存在
+          mkdir -p public
           
-          # 确保CoffeeScript已全局安装
-          pnpm add -g coffeescript
+          # 使用npx确保能找到coffee命令
+          npx coffee -c -o public src/
           
-          # 构建项目
-          pnpm build
-          
-          # 复制根目录的index.html到public目录
-          cp index.html public/_root_index.html
+          # 添加部署时间戳
+          DEPLOY_TIME=$(date)
+          sed -i "s/{{ DEPLOY_TIME }}/$DEPLOY_TIME/g" public/test.html
           
           # 验证构建结果
-          echo "验证构建文件是否存在..."
+          echo "构建完成，检查文件："
           ls -la public/
           
-          # 处理占位符
-          echo "${{ secrets.STATS_SCRIPT }}" > placeholder
-          sed -i "/<!-- placeholder -->/ {
-            r placeholder
-            d
-          }" public/index.html
-      - name: Deploy 🚀
+          # 确保必要文件存在
+          if [ ! -f "public/script.js" ]; then
+            echo "错误: script.js 文件未生成"
+            exit 1
+          fi
+          
+          echo "script.js 文件大小:"
+          wc -c public/script.js
+          
+      - name: Deploy to GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
           folder: public
-          clean: true  # 清理旧文件
-          single-commit: false  # 保存部署历史
-          clean-exclude: |
-            .nojekyll
+          clean: true
