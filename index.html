@@ -4,6 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="./manifest.json">
     <title>ImgSeal - 专业图片水印工具</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link
@@ -186,6 +191,7 @@
 
         .range-control {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
             height: 6px;
             border-radius: 3px;
@@ -703,6 +709,265 @@
             font-size: 1.2em;
             margin-right: 6px;
         }
+
+        /* ==================== 移动端适配 ==================== */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .container {
+                border-radius: 15px;
+                margin: 0;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+                margin-bottom: 8px;
+            }
+
+            .header .subtitle {
+                font-size: 0.9em;
+                margin-bottom: 15px;
+            }
+
+            .header .features {
+                gap: 15px;
+                justify-content: space-around;
+            }
+
+            .feature {
+                font-size: 0.8em;
+                gap: 4px;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .step {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+
+            .step-header {
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+
+            .step-number {
+                width: 30px;
+                height: 30px;
+                font-size: 1em;
+            }
+
+            .step-title {
+                font-size: 1.1em;
+            }
+
+            .form-control {
+                padding: 10px 12px;
+                font-size: 16px; /* 防止iOS缩放 */
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .radio-option {
+                padding: 12px 15px;
+                justify-content: center;
+            }
+
+            .range-group {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .range-item {
+                gap: 10px;
+            }
+
+            .watermark-options {
+                padding: 15px;
+            }
+
+            .pdf-pages {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+
+            .pdf-page {
+                padding: 8px;
+            }
+
+            .pdf-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .pdf-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .canvas-preview {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer {
+                padding: 12px;
+                margin-top: 15px;
+            }
+
+            .github-link {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
+
+            /* 文件上传区域优化 */
+            .file-upload-label {
+                padding: 20px 15px;
+                font-size: 14px;
+                min-height: 80px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .file-upload-label i {
+                font-size: 2em;
+            }
+
+            /* 移动端按钮优化 */
+            .btn {
+                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+                tap-highlight-color: rgba(102, 126, 234, 0.3);
+            }
+
+            /* 移动端滚动优化 */
+            .pdf-pages {
+                -webkit-overflow-scrolling: touch;
+                overflow-scrolling: touch;
+            }
+
+            /* 移动端选择优化 */
+            .pdf-page {
+                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+                tap-highlight-color: rgba(102, 126, 234, 0.2);
+            }
+        }
+
+        /* 小屏手机适配 */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 5px;
+                /* 适配刘海屏等异形屏幕 */
+                padding-top: max(5px, env(safe-area-inset-top));
+                padding-bottom: max(5px, env(safe-area-inset-bottom));
+                padding-left: max(5px, env(safe-area-inset-left));
+                padding-right: max(5px, env(safe-area-inset-right));
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header .features {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .feature {
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 15px 10px;
+            }
+
+            .step {
+                padding: 15px 10px;
+            }
+
+            .pdf-pages {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .range-group {
+                gap: 12px;
+            }
+
+            .form-label {
+                font-size: 0.9em;
+            }
+        }
+
+        /* 触摸优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover,
+            .radio-option:hover,
+            .pdf-page:hover,
+            .step:hover {
+                transform: none;
+            }
+
+            .btn:active {
+                transform: scale(0.98);
+            }
+
+            .radio-option:active,
+            .pdf-page:active {
+                transform: scale(0.98);
+            }
+
+            /* 增大触摸目标 */
+            .radio-option,
+            .pdf-page,
+            .btn {
+                min-height: 44px; /* iOS 推荐的最小触摸目标 */
+            }
+
+            .range-control {
+                height: 8px; /* 加粗滑块轨道 */
+            }
+
+            .range-control::-webkit-slider-thumb {
+                width: 24px;
+                height: 24px;
+            }
+
+            .range-control::-moz-range-thumb {
+                width: 24px;
+                height: 24px;
+            }
+        }
     </style>
 </head>
 
@@ -973,6 +1238,19 @@
             const src = script.src;
             return src.substring(0, src.lastIndexOf('/') + 1);
         })();
+
+        // 注册Service Worker（仅在支持的浏览器中）
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker 注册成功:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+            });
+        }
     </script>
     <script src="./script.js"></script>
 
