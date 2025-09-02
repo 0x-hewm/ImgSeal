@@ -1475,3 +1475,118 @@ initializePreviewArea = ->
 
 # 页面加载完成后初始化预览区域
 initializePreviewArea()
+
+# ==================== 移动端优化 ====================
+
+# 检测是否为移动设备
+isMobile = -> 
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) or window.innerWidth <= 768
+
+# 移动端触摸优化
+if isMobile()
+    # 禁用双击缩放（在某些输入元素上）
+    document.addEventListener 'touchstart', (e) ->
+        if e.touches.length > 1
+            e.preventDefault()
+    , { passive: false }
+    
+    # 优化文件选择体验
+    fileInput = $ '#image'
+    if fileInput
+        fileInput.addEventListener 'click', ->
+            # 在移动端点击文件输入时，确保能正确触发文件选择
+            this.value = ''
+    
+    # 优化滑块在移动端的体验
+    rangeInputs = document.querySelectorAll '.range-control'
+    rangeInputs.forEach (input) ->
+        input.addEventListener 'touchstart', (e) ->
+            # 防止页面滚动
+            e.stopPropagation()
+        , { passive: true }
+    
+    # 改善PDF页面选择在移动端的体验
+    pdfPagesContainer?.addEventListener 'touchstart', (e) ->
+        # 防止触摸时的意外滚动
+        if e.target.closest('.pdf-page')
+            e.stopPropagation()
+    , { passive: true }
+
+# 屏幕方向改变时重新布局
+window.addEventListener 'orientationchange', ->
+    setTimeout ->
+        # 强制重新计算布局
+        if canvas and canvas.style
+            canvas.style.maxWidth = '100%'
+            canvas.style.height = 'auto'
+        
+        # 重新渲染预览（如果存在）
+        if state.currentPDF and selectedPages.size > 0
+            updatePreviewArea()
+    , 100
+
+# 移动端键盘优化
+if isMobile()
+    # 当虚拟键盘弹出时，调整视图
+    textInput = $ '#text'
+    if textInput
+        textInput.addEventListener 'focus', ->
+            # 滚动到输入框位置
+            setTimeout ->
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            , 300
+        
+        textInput.addEventListener 'blur', ->
+            # 键盘收起后，滚动回顶部
+            setTimeout ->
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+            , 100
+
+# 添加加载状态提示（移动端网络可能较慢）
+showMobileLoadingTip = (message) ->
+    if isMobile()
+        tip = document.createElement 'div'
+        tip.className = 'mobile-loading-tip'
+        tip.innerHTML = """
+            <div style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-size: 14px;
+                z-index: 10000;
+                text-align: center;
+            ">
+                <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+                #{message}
+            </div>
+        """
+        document.body.appendChild tip
+        tip
+
+hideMobileLoadingTip = ->
+    tip = document.querySelector '.mobile-loading-tip'
+    tip?.remove()
+
+# 覆盖原有的文件处理函数，添加移动端加载提示
+originalImageLoad = image.onchange
+image.onchange = (e) ->
+    if isMobile()
+        file = e.target.files[0]
+        if file
+            if file.type.includes('pdf')
+                showMobileLoadingTip('正在处理PDF文件...')
+            else
+                showMobileLoadingTip('正在处理图片文件...')
+            
+            # 延迟执行原始处理函数，让加载提示先显示
+            setTimeout ->
+                originalImageLoad.call(this, e)
+                setTimeout hideMobileLoadingTip, 500
+            , 100
+    else
+        originalImageLoad.call(this, e)
