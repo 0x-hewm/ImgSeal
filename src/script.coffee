@@ -307,7 +307,14 @@ readImageFile = ->
         img = new Image
         img.onload = ->
             setupCanvas img
+        img.onerror = ->
+            hideMobileLoadingTip()
+            alert '图片文件格式不支持或已损坏'
         img.src = fileReader.result
+
+    fileReader.onerror = ->
+        hideMobileLoadingTip()
+        alert '图片文件读取失败，请检查文件是否损坏'
 
     fileReader.readAsDataURL file
 
@@ -389,6 +396,10 @@ readPDFFile = ->
                         
                         graph.appendChild canvas
                         
+                        # 移动端隐藏加载提示（PDF处理完成）
+                        if isMobile()
+                            setTimeout hideMobileLoadingTip, 300
+                        
                         # 添加点击下载功能
                         canvas.addEventListener 'click', ->
                             downloadFormat = document.querySelector('input[name="download-format"]:checked')?.value || 'png'
@@ -420,6 +431,7 @@ readPDFFile = ->
                 renderPagesSequentially pdf, numPages
                     
             .catch (error) ->
+                hideMobileLoadingTip()
                 console.error 'PDF加载错误:', error
                 console.error 'Error details:', error.name, error.message
                 if error.name == 'InvalidPDFException'
@@ -431,10 +443,12 @@ readPDFFile = ->
                 else
                     alert "PDF文件加载失败: #{error.message || '未知错误'}"
         catch generalError
+            hideMobileLoadingTip()
             console.error 'PDF处理异常:', generalError
             alert "PDF处理失败: #{generalError.message || '未知错误'}"
     
     fileReader.onerror = ->
+        hideMobileLoadingTip()
         console.error 'PDF文件读取失败'
         alert '文件读取失败，请检查文件是否损坏或过大'
     
@@ -1007,6 +1021,10 @@ setupCanvas = (img, pageNum = null) ->
     
     graph.appendChild canvas
 
+    # 移动端隐藏加载提示（图片处理完成）
+    if isMobile()
+        setTimeout hideMobileLoadingTip, 300
+
     canvas.addEventListener 'click', ->
         # 确定下载格式
         downloadFormat = 'png'  # 默认PNG
@@ -1228,7 +1246,13 @@ drawImageWatermarkOnCanvas = (targetCanvas, ctx) ->
             ctx.restore()
             textCtx = ctx if targetCanvas == canvas
         
+        watermarkImg.onerror = ->
+            console.error '水印图片加载失败'
+        
         watermarkImg.src = watermarkReader.result
+    
+    watermarkReader.onerror = ->
+        console.error '水印图片文件读取失败'
     
     watermarkReader.readAsDataURL watermarkImageFile
 
@@ -1237,6 +1261,13 @@ drawImageWatermarkOnCanvas = (targetCanvas, ctx) ->
 image.addEventListener 'change', ->
     file = @files[0]
     
+    # 移动端显示加载提示
+    if isMobile() and file
+        if file.type.includes('pdf')
+            showMobileLoadingTip('正在处理PDF文件...')
+        else
+            showMobileLoadingTip('正在处理图片文件...')
+    
     # 支持更多图片格式和PDF
     supportedTypes = [
         'image/png', 'image/jpeg', 'image/gif', 'image/webp', 
@@ -1244,6 +1275,7 @@ image.addEventListener 'change', ->
     ]
     
     if file.type not in supportedTypes
+        hideMobileLoadingTip() if isMobile()
         alert '仅支持图片文件 (PNG, JPG, GIF, WebP, BMP, SVG) 和 PDF 文件'
         return
     
@@ -1573,20 +1605,4 @@ hideMobileLoadingTip = ->
     tip?.remove()
 
 # 覆盖原有的文件处理函数，添加移动端加载提示
-originalImageLoad = image.onchange
-image.onchange = (e) ->
-    if isMobile()
-        file = e.target.files[0]
-        if file
-            if file.type.includes('pdf')
-                showMobileLoadingTip('正在处理PDF文件...')
-            else
-                showMobileLoadingTip('正在处理图片文件...')
-            
-            # 延迟执行原始处理函数，让加载提示先显示
-            setTimeout ->
-                originalImageLoad.call(this, e)
-                setTimeout hideMobileLoadingTip, 500
-            , 100
-    else
-        originalImageLoad.call(this, e)
+# 注意：不能直接覆盖 addEventListener，需要修改原始事件处理器
